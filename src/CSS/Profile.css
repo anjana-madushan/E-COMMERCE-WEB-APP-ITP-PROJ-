@@ -1,0 +1,11 @@
+.text-center{
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    font-weight: bold;
+    font-size: 60px;
+}
+
+.Profile{
+    background-color: #F0FFF0;
+}

@@ -1,0 +1,40 @@
+.text-center{
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    font-weight: bold;
+    font-size: 40px;
+}
+
+.ContactUs{
+    background-color: #F0FFF0;
+}
+
+.Contactimg{
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.h40{
+    text-align: flex;
+    letter-spacing: 5px;
+    font-weight: bold;
+    font-size: 27px;
+}
+
+.h39{
+    text-align: flex;
+    letter-spacing: 5px;
+    font-weight: bold;
+    font-size: 25px;
+}
+.center{
+    text-align: center;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 100%;
+    }
