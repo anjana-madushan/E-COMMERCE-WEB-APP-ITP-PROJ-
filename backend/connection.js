@@ -1,8 +1,8 @@
-require('dotenv').config();
+require('dotenv').config({ path: '.env.local' });
 
 const mongoose = require('mongoose');
 
-const connectionStr = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PW}@cluster0.2l7lxuo.mongodb.net/?retryWrites=true&w=majority`;
+const connectionStr = process.env.MONGO_URI;
 mongoose.connect(connectionStr, {useNewUrlparser: true})
 .then(() => console.log('connected to mongodb'))
 .catch(err => console.log(err))

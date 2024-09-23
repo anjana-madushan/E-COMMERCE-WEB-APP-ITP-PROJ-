@@ -4,6 +4,7 @@ const app = express();
 const http = require('http');
 require('dotenv').config();
 const Stripe = require('stripe');
+//TODO: @Anjana - Configure secure environment variables for Stripe
 const stripe = Stripe('sk_test_51LhBwPD1ftP7zi2EFzCqknBRwERKsNxtKCEJGL7I6ng3mSy6nOAW8kSIz8ivpxVXBpGfcObm7cRCFzqh1rIHcDYR00VAPeCQ9k');
 
 require('./connection');

@@ -2,6 +2,7 @@ const cloudinary = require('cloudinary');
 const router = require('express').Router();
 require('dotenv').config();
 
+// TODO: @Anjana - Configure secure environment variables for Cloudinary
 cloudinary.config({
   cloud_name:  "dvcfip5fe",
   api_key:  "533411778726318",
