@@ -9,15 +9,15 @@ const stripe = Stripe('sk_test_51LhBwPD1ftP7zi2EFzCqknBRwERKsNxtKCEJGL7I6ng3mSy6
 
 require('./connection');
 const server = http.createServer(app);
-const {Server} = require('socket.io');
+const { Server } = require('socket.io');
 
 const io = new Server(server, {
   cors: '*',
-  methods:'*'
+  methods: '*'
 })
 
 
-const User = require('./models/User');
+// const User = require('./models/User');
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const feedbackRoutes = require("./routes/feedbackRoutes");
@@ -25,8 +25,8 @@ const imageRoutes = require('./routes/imageRoutes')
 const orderRoutes = require('./routes/orderRoutes');
 const stockRoute = require('./routes/stock.route')
 const gradeRoute = require('./routes/grade.route')
- app.use(cors());
-app.use(express.urlencoded({extended: true}));
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/products', productRoutes);
@@ -37,8 +37,8 @@ app.use('/stocks', stockRoute)
 app.use('/grades', gradeRoute)
 
 //Stripe payments
-app.post('/create-payment', async(req, res)=> {
-  const {amount} = req.body;
+app.post('/create-payment', async (req, res) => {
+  const { amount } = req.body;
   console.log(amount);
   try {
     const paymentIntent = await stripe.paymentIntents.create({
@@ -50,7 +50,7 @@ app.post('/create-payment', async(req, res)=> {
   } catch (e) {
     console.log(e.message);
     res.status(400).json(e.message);
-   }
+  }
 })
 
 
