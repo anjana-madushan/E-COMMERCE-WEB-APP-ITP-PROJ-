@@ -29,7 +29,7 @@ import { useNavigate } from "react-router-dom";
    };
 
 
-   const user = useSelector((state) => state.user);
+   const user = useSelector((state) => state.user.user);
    const sendRequest = async () => {
     const res = await axios
       .get("http://localhost:4000/feedbacks/getallfeedbacks")

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import Feedback from "./Feedback";
 //FeedbackDetails function
 const FeedbackDetail = () => {
-  const userid = useSelector((state) => state.user._id);
+  const userid = useSelector((state) => state.user.user._id);
   //Use of use state react hooks
   const [feedback, setFeedback] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");

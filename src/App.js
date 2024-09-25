@@ -40,7 +40,7 @@ import GRADEPDF from './components/GRADEPDF';
 import ContactUs from './pages/ContactUs';
 
 function App() {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   useEffect(() => {
     const socket = io("ws://localhost:4000");

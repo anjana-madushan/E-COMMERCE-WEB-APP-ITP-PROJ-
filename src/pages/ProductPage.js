@@ -15,7 +15,7 @@ import ToastMessage from '../components/ToastMessage';
 function ProductPage() {
 
     const { id } = useParams();
-    const user = useSelector((state) => state.user);
+    const user = useSelector((state) => state.user.user);
     const [product, setProduct] = useState(null);
     const [similar, setSimilar] = useState(null);
     const [addToCart, { isSuccess }] = useAddToCartMutation();

@@ -8,7 +8,7 @@ import Pagination from "./Pagination";
 
 function DashboardProducts() {
     const products = useSelector((state) => state.products);
-    const user = useSelector((state) => state.user);
+    const user = useSelector((state) => state.user.user);
     // removing the product
     const [deletProduct, { isLoading, isSuccess }] = useDeleteProductMutation();
     function handleDeleteProduct(id) {

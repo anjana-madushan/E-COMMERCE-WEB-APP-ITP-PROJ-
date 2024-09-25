@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 function Navigation() {
   const history = useNavigate();
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user.user);
   const bellRef = useRef(null)
   const notificationRef = useRef(null);
   const [bellPos, setBellPos] = useState({});

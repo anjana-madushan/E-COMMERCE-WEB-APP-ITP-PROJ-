@@ -42,7 +42,7 @@ router.post('/login', async (req, res) => {
     user.tokens.push(refreshToken);
     await user.save();
 
-    res.json({ accessToken, refreshToken, user: user.toJSON() });
+    res.json({ accessToken, refreshToken, user });
   } catch (e) {
     res.status(400).send(e.message)
   }
