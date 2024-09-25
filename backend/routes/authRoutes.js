@@ -12,7 +12,7 @@ const issuer = process.env.ISSUER;
 
 // Generate tokens
 const generateAccessToken = (user) => {
-  return jwt.sign({ id: user._id }, accessTokenSecret, { expiresIn: accessTokenLife, issuer: issuer });
+  return jwt.sign({ id: user._id, isAdmin: user.isAdmin }, accessTokenSecret, { expiresIn: accessTokenLife, issuer: issuer });
 };
 
 const generateRefreshToken = (user) => {
