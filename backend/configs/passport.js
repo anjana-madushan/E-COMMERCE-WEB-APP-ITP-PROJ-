@@ -1,15 +1,15 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const passport = require("passport");
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/User');
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
+const User = require("../models/User");
 require("dotenv").config({ path: ".env.local" });
 
 // JWT strategy
-// const opts = {
-//   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-//   secretOrKey: process.env.JWT_SECRET,
-// };
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET,
+};
 
 passport.use(
   new GoogleStrategy(
@@ -17,10 +17,10 @@ passport.use(
       clientID: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: "http://localhost:4000/users/google/callback",
-      passReqToCallback: true,  
+      passReqToCallback: true,
     },
     function (req, accessToken, refreshToken, profile, done) {
-      done(null, profile);  
+      done(null, profile);
       console.log("profile", profile);
     }
   )
@@ -36,19 +36,19 @@ passport.deserializeUser((user, done) => {
 
 //JWT strategy
 
-// passport.use(
-//   new JwtStrategy(opts, async (jwt_payload, done) => {
-//     try {
-//       const user = await User.findById(jwt_payload.id);
-//       if (user) {
-//         return done(null, user);
-//       } else {
-//         return done(null, false);
-//       }
-//     } catch (err) {
-//       return done(err, false);
-//     }
-//   })
-// );
+passport.use(
+  new JwtStrategy(opts, async (jwt_payload, done) => {
+    try {
+      const user = await User.findById(jwt_payload.id);
+      if (user) {
+        return done(null, user);
+      } else {
+        return done(null, false);
+      }
+    } catch (err) {
+      return done(err, false);
+    }
+  })
+);
 
-// module.exports = passport;
+module.exports = passport;

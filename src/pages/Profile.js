@@ -11,7 +11,7 @@ import LocationCityIcon from '@mui/icons-material/LocationCity';
 
 //Customer profile function
 function Profile () {
-   const userd = useSelector((state) => state.user);
+   const userd = useSelector((state) => state?.user?.user);
    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     

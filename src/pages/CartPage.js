@@ -12,7 +12,7 @@ import CheckoutForm from "../components/CheckoutForm";
 const stripePromise = loadStripe("pk_test_51LhBwPD1ftP7zi2EyNFkPwVpF1aNqWAcSPfC1uOax7uhBS0PTBsarzTDeHWW05tboEdPmVfhjFiMblPy3zThFb3D00HMPZn8jh");
 
 function CartPage() {
-    const user = useSelector((state) => state.user);
+    const user = useSelector((state) => state?.user?.user);
     const products = useSelector((state) => state.products);
     const userCartObj = user.cart;
     let cart = products.filter((product) => userCartObj[product._id] != null);
