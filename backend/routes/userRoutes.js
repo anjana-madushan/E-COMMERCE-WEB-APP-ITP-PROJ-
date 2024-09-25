@@ -36,14 +36,13 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findByCredentials(email, password);
-    // const accessToken = generateAccessToken(user);
-    // const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    // user.tokens.push(refreshToken);
+    user.tokens.push(refreshToken);
     await user.save();
 
-    // res.json({ accessToken, refreshToken, user: user.toJSON() });
-    res.json({ user: user.toJSON() });
+    res.json({ accessToken, refreshToken, user: user.toJSON() });
   } catch (e) {
     res.status(400).send(e.message)
   }

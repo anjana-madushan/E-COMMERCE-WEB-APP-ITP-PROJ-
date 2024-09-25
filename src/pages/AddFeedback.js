@@ -41,7 +41,7 @@ import '../CSS/Post feedback.css';
         image: inputs.imageURL,
         user: User._id,
          }).catch((err) => console.log(err));
-      const data = await res.data;
+      const data = await res?.data;
         return data;
     };
 
