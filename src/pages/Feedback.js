@@ -24,7 +24,7 @@ import"../CSS/Feedback.css"
     const [Title, setTitle] = useState("");
     const [Description, setDescription] = useState("");
     const [Image, setImage] = useState("");
-    const user_id = useSelector((state) => state.user.user._id);
+    const user_id = useSelector((state) => state?.user?.user?._id);
 
   //Handle Edit function
     const handleEdit = () => {
@@ -40,8 +40,8 @@ import"../CSS/Feedback.css"
         }
       });
     };
-    const isAdmin = useSelector((state) => state.user.user.isAdmin);
-    const thisuser = useSelector((state) => state.user.user._id);
+    const isAdmin = useSelector((state) => state?.user?.user?.isAdmin);
+    const thisuser = useSelector((state) => state?.user?.user?._id);
   //Sending the delete request to the backend
     const deleteRequest = async () => {
     const res = await axios

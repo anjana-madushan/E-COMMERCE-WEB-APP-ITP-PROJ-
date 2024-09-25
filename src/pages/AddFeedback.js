@@ -10,7 +10,7 @@ import '../CSS/Post feedback.css';
   const labelStyles = { mb: 1, mt: 2, fontSize: "24px", fontWeight: "bold" };
   //Add feedback function
   const AddFeedback = () => {
-    const User = useSelector((state) => state.user);
+    const User = useSelector((state) => state?.user?.user);
     //Use of styles from mui system
     //Use of navigate from react router dom
       useEffect(() => {
