@@ -49,15 +49,12 @@ router.post('/login', async (req, res) => {
 })
 
 //OAuth login 
-router.get("/google", passport.authenticate("google", ["profile", "email"]));
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get(
-	"/google/callback",
-	passport.authenticate("google", {
-		successRedirect: process.env.CLIENT_URL,
-		failureRedirect: "/login/failed",
-	})
-);
+router.get("/google/callback", passport.authenticate("google", {
+  successRedirect: process.env.CLIENT_URL,
+  failureRedirect: "/login/failed",
+}));
 
 //login failed
 router.get('/login/failed', (req, res) => {
