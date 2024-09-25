@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const passport = require('passport');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
@@ -45,6 +46,22 @@ router.post('/login', async (req, res) => {
   } catch (e) {
     res.status(400).send(e.message)
   }
+})
+
+//OAuth login 
+router.get("/google", passport.authenticate("google", ["profile", "email"]));
+
+router.get(
+	"/google/callback",
+	passport.authenticate("google", {
+		successRedirect: process.env.CLIENT_URL,
+		failureRedirect: "/login/failed",
+	})
+);
+
+//login failed
+router.get('/login/failed', (req, res) => {
+  res.status(400).send('OAuth Login Failed')
 })
 
 //get user
