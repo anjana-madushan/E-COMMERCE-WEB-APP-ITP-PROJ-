@@ -1,4 +1,4 @@
-let  express = require('express'),
+let express = require('express'),
   router = express.Router();
 
 // exam Model
@@ -6,7 +6,7 @@ let stockSchema = require('../models/Stock');
 
 // CREATE exam
 router.route('/create-stock').post((req, res, next) => {
- stockSchema.create(req.body, (error, data) => {
+  stockSchema.create(req.body, (error, data) => {
     if (error) {
       return next(error)
     } else {
@@ -17,8 +17,8 @@ router.route('/create-stock').post((req, res, next) => {
 });
 
 // READ grade
-router.route('/').get((req, res) => {
- stockSchema.find((error, data) => {
+router.route('/').get((req, res, next) => {
+  stockSchema.find((error, data) => {
     if (error) {
       return next(error)
     } else {
@@ -28,8 +28,8 @@ router.route('/').get((req, res) => {
 })
 
 // Get Single grade
-router.route('/edit-stock/:id').get((req, res) => {
- stockSchema.findById(req.params.id, (error, data) => {
+router.route('/edit-stock/:id').get((req, res, next) => {
+  stockSchema.findById(req.params.id, (error, data) => {
     if (error) {
       return next(error)
     } else {
@@ -41,12 +41,11 @@ router.route('/edit-stock/:id').get((req, res) => {
 
 // Update grade
 router.route('/update-stock/:id').put((req, res, next) => {
- stockSchema.findByIdAndUpdate(req.params.id, {
+  stockSchema.findByIdAndUpdate(req.params.id, {
     $set: req.body
   }, (error, data) => {
     if (error) {
       return next(error);
-      console.log(error)
     } else {
       res.json(data)
       console.log('stock updated successfully !')
@@ -56,7 +55,7 @@ router.route('/update-stock/:id').put((req, res, next) => {
 
 // Delete grade
 router.route('/delete-stock/:id').delete((req, res, next) => {
- stockSchema.findByIdAndRemove(req.params.id, (error, data) => {
+  stockSchema.findByIdAndRemove(req.params.id, (error, data) => {
     if (error) {
       return next(error);
     } else {
