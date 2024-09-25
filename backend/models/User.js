@@ -59,6 +59,11 @@ const UserSchema = mongoose.Schema({
     default: []
   },
 
+  tokens: {
+    type: Array,
+    default: []
+  },
+
   orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }]
 
 }, { minimize: false });
@@ -75,6 +80,7 @@ UserSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
   delete userObject.password;
+  delete userObject.tokens;
   return userObject;
 }
 
