@@ -1,14 +1,22 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const http = require('http');
+const https = require('https');
+const fs = require('fs');
 require('dotenv').config();
 const Stripe = require('stripe');
 //TODO: @Anjana - Configure secure environment variables for Stripe
 const stripe = Stripe('sk_test_51LhBwPD1ftP7zi2EFzCqknBRwERKsNxtKCEJGL7I6ng3mSy6nOAW8kSIz8ivpxVXBpGfcObm7cRCFzqh1rIHcDYR00VAPeCQ9k');
 
+const options = {
+  key: fs.readFileSync('auth/myCA.key'),
+  cert: fs.readFileSync('auth/myCA.pem'),
+  passphrase: process.env.Cert_Pass
+};
+
+
 require('./connection');
-const server = http.createServer(app);
+const server = https.createServer(options ,app);
 const { Server } = require('socket.io');
 
 const io = new Server(server, {
