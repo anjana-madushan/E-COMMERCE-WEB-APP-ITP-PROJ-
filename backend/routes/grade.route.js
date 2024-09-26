@@ -1,11 +1,12 @@
-let express = require("express"),
-  router = express.Router();
+const express = require('express');
+const app = express;
+const router = new app.Router();
 
 // exam Model
-let gradeSchema = require("../models/Grade");
+const gradeSchema = require('../models/Grade');
 
 // CREATE exam
-router.route("/create-grade").post((req, res, next) => {
+router.route('/create-grade').post((req, res, next) => {
   gradeSchema.create(req.body, (error, data) => {
     if (error) {
       return next(error);
@@ -17,18 +18,18 @@ router.route("/create-grade").post((req, res, next) => {
 });
 
 // READ grade
-router.route("/").get((req, res) => {
+router.route('/').get((req, res, next) => {
   gradeSchema.find((error, data) => {
     if (error) {
       return next(error);
     } else {
-      res.json(data);
+      return res.json(data);
     }
   });
 });
 
 // Get Single grade
-router.route("/edit-grade/:id").get((req, res) => {
+router.route('/edit-grade/:id').get((req, res, next) => {
   gradeSchema.findById(req.params.id, (error, data) => {
     if (error) {
       return next(error);
@@ -39,26 +40,25 @@ router.route("/edit-grade/:id").get((req, res) => {
 });
 
 // Update grade
-router.route("/update-grade/:id").put((req, res, next) => {
+router.route('/update-grade/:id').put((req, res, next) => {
   gradeSchema.findByIdAndUpdate(
-    req.params.id,
-    {
-      $set: req.body,
-    },
-    (error, data) => {
-      if (error) {
-        return next(error);
-        console.log(error);
-      } else {
-        res.json(data);
-        console.log("grade updated successfully !");
-      }
-    }
+      req.params.id,
+      {
+        $set: req.body,
+      },
+      (error, data) => {
+        if (error) {
+          return next(error);
+        } else {
+          res.json(data);
+          console.log('grade updated successfully !');
+        }
+      },
   );
 });
 
 // Delete grade
-router.route("/delete-grade/:id").delete((req, res, next) => {
+router.route('/delete-grade/:id').delete((req, res, next) => {
   gradeSchema.findByIdAndRemove(req.params.id, (error, data) => {
     if (error) {
       return next(error);

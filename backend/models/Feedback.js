@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const feedbackSchema = new Schema({
@@ -19,7 +19,7 @@ const feedbackSchema = new Schema({
 
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   },
   date: {
@@ -30,6 +30,6 @@ const feedbackSchema = new Schema({
   },
 });
 
-const Feedback = mongoose.model("Feedback", feedbackSchema);
+const Feedback = mongoose.model('Feedback', feedbackSchema);
 
 module.exports = Feedback;
