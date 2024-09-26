@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 
 // JWT secret and expiry times
 const accessTokenSecret = process.env.JWT_SECRET;
+const urlTokenScret = process.env.JWT_SECRET_URL;
 const refreshTokenSecret = process.env.JWT_REFRESH_SECRET;
 const accessTokenLife = "15m";
 const refreshTokenLife = "7d";
@@ -75,11 +76,11 @@ router.get("/google/callback", (req, res, next) => {
       // Generate JWT token with user data
       const token = jwt.sign(
         { id: user._id, email: user.email },
-        accessTokenSecret,
+        urlTokenScret,
         { expiresIn: "1h" }
       );
 
-      // Option 1: Redirect with JWT in query string (token only)
+      //Redirect with JWT in query string (token only)
       res.redirect(`${process.env.CLIENT_URL}/?token=${token}`);
     });
   })(req, res, next);

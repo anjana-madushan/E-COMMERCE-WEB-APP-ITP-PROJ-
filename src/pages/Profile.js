@@ -11,14 +11,14 @@ import LocationCityIcon from '@mui/icons-material/LocationCity';
 
 //Customer profile function
 function Profile () {
-   const userd = useSelector((state) => state?.user?.user);
+   const user = useSelector((state) => state?.user?.user);
    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     
     useEffect(() => {
         setLoading(true);
         axios
-            .get(`/users/${userd._id}`)
+            .get(`/users/${user._id}`)
             .then(({ data }) => {
                 setLoading(false);
                 setUsers(data);
