@@ -1,14 +1,42 @@
-const passport = require('passport');
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/User');
-require('dotenv').config();
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const passport = require("passport");
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
+const User = require("../models/User");
+require("dotenv").config({ path: ".env.local" });
 
+
+// JWT strategy
 const opts = {
   jwtFromRequest: ExtractJwt.fromExtractors([(req) => req.cookies.accessToken]),
   secretOrKey: process.env.JWT_SECRET,
   issuer: process.env.ISSUER,
 };
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      callbackURL: "http://localhost:4000/users/google/callback",
+      passReqToCallback: true,
+    },
+    function (req, accessToken, refreshToken, profile, done) {
+      done(null, profile);
+      console.log("profile", profile);
+    }
+  )
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
+});
+
+//JWT strategy
 
 passport.use(
   new JwtStrategy(opts, async (jwt_payload, done) => {
