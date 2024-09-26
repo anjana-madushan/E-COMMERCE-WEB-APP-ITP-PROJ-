@@ -1,11 +1,9 @@
 const router = require("express").Router();
-const passport = require("passport");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
 // JWT secret and expiry times
 const accessTokenSecret = process.env.JWT_SECRET;
-const urlTokenScret = process.env.JWT_SECRET_URL;
 const refreshTokenSecret = process.env.JWT_REFRESH_SECRET;
 const accessTokenLife = "15m";
 const refreshTokenLife = "7d";
@@ -53,41 +51,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-//OAuth sigup
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
 
-router.get("/google/callback", (req, res, next) => {
-  passport.authenticate("google", (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.redirect("/oauth/failed");
-    }
-
-
-//OAuth login 
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-
-      // Generate JWT token with user data
-      const token = jwt.sign(
-        { id: user._id, email: user.email },
-        urlTokenScret,
-        { expiresIn: "1h" }
-      );
-
-      //Redirect with JWT in query string (token only)
-      res.redirect(`${process.env.CLIENT_URL}/?token=${token}`);
-    });
-  })(req, res, next);
-});
 
 //get user
 router.get("/", async (req, res) => {

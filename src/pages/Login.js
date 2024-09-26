@@ -53,7 +53,7 @@ function Login() {
     } else if (!oAuth) {
       alert("Please complete the reCAPTCHA challenge.");
     } else {
-      window.open(`${process.env.REACT_APP_API_URL}/users/google/`);
+      window.open(`${process.env.REACT_APP_API_URL}/auth/google/`);
     }
   }
 
