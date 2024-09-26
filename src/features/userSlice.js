@@ -10,6 +10,7 @@ export const userSlice = createSlice({
     initialState,
     reducers: {
         logout:()=> initialState,
+        setUser: (state, action) => action.payload, 
         addNotification: (state, action) => {
             state.notifications.unshift(action.payload);
         },
@@ -30,5 +31,5 @@ export const userSlice = createSlice({
     }
          
         });
-export const{logout,addNotification, resetNotifications} = userSlice.actions
+export const{logout, setUser, addNotification, resetNotifications} = userSlice.actions
 export default userSlice.reducer;  

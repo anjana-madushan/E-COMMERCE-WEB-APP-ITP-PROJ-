@@ -22,7 +22,6 @@ function ProductPage() {
 
    const handleDragStart = (e) => e.preventDefault();
     useEffect(() => {
-        console.log("UserAmmmo",user)
         axios.get(`/products/${id}`).then(({ data }) => {
             setProduct(data.product);
             setSimilar(data.similar);

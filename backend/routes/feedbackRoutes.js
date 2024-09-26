@@ -36,7 +36,6 @@ router.get("/report/:date", async (req, res) => {
 router.post("/addFeedback", async (req, res) => {
   const { title, description, image, user } = req.body;
 
-  console.log("rewqs",user);
   let existingUser;
   try {
     existingUser = await User.findById(user);
