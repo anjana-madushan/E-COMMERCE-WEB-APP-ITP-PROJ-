@@ -3,120 +3,112 @@ const mongoose = require("mongoose");
 const Feedback = require("../models/Feedback");
 const User = require("../models/User");
 
-//get all feedbacks
+// Get all feedbacks
 router.get("/getallfeedbacks", async (req, res) => {
-  let feedbacks;
   try {
-    feedbacks = await Feedback.find().populate("user");
+    const feedbacks = await Feedback.find().populate("user");
+    if (!feedbacks || feedbacks.length === 0) {
+      return res.status(404).json({ message: "No feedbacks found" });
+    }
+    return res.status(200).json({ feedbacks });
   } catch (err) {
-    return console.log(err);
+    console.error("Error fetching feedbacks:", err);
+    return res.status(500).json({ message: "Server error. Please try again later." });
   }
-  if (!feedbacks) {
-    return res.status(404).json({ message: "No Feedbacks Found" });
-  }
-  return res.status(200).json({ feedbacks });
 });
 
-//Report
+// Report feedbacks by date
 router.get("/report/:date", async (req, res) => {
-  let feedbacks;
   const { date } = req.params;
   try {
-    feedbacks = await Feedback.find({ createdAt: date });
+    const feedbacks = await Feedback.find({ createdAt: date });
+    if (!feedbacks || feedbacks.length === 0) {
+      return res.status(404).json({ message: "No feedbacks found for the given date" });
+    }
+    return res.status(200).json({ feedbacks });
   } catch (err) {
-    return console.log(err);
+    console.error("Error fetching feedbacks by date:", err);
+    return res.status(500).json({ message: "Server error. Please try again later." });
   }
-  if (!feedbacks) {
-    return res.status(404).json({ message: "No Feedbacks Found" });
-  }
-  return res.status(200).json({ feedbacks });
 });
 
-//addFeedbacks
+// Add feedback
 router.post("/addFeedback", async (req, res) => {
   const { title, description, image, user } = req.body;
 
-  let existingUser;
   try {
-    existingUser = await User.findById(user);
-  } catch (err) {
-    return console.log(err);
-  }
-  if (!existingUser) {
-    return res.status(400).json({ message: "Unable To Find User By this ID" });
-  }
-  const feedback = new Feedback({
-    title,
-    description,
-    image,
-    user,
-  });
-  try {
+    const existingUser = await User.findById(user);
+    if (!existingUser) {
+      return res.status(400).json({ message: "User not found with the provided ID" });
+    }
+
+    const feedback = new Feedback({ title, description, image, user });
     const session = await mongoose.startSession();
     session.startTransaction();
+    
     await feedback.save({ session });
     existingUser.feedbacks.push(feedback);
     await existingUser.save({ session });
     await session.commitTransaction();
+
+    return res.status(201).json({ message: "Feedback created successfully", feedback });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: err });
+    console.error("Error adding feedback:", err);
+    return res.status(500).json({ message: "Server error. Could not add feedback. Please try again later." });
   }
-  return res.status(200).json({ feedback });
 });
 
-//Update feedback
+// Update feedback
 router.put("/updateFeedback/:id", async (req, res) => {
   const { id } = req.params;
   const { title, description, image, user } = req.body;
-  let feedback;
+
   try {
-    feedback = await Feedback.findByIdAndUpdate(id, {
-      title,
-      description,
-      image,
-      user,
-    });
+    const feedback = await Feedback.findByIdAndUpdate(id, { title, description, image, user }, { new: true });
+    if (!feedback) {
+      return res.status(404).json({ message: `Feedback with ID ${id} not found` });
+    }
+    return res.status(200).json({ message: "Feedback updated successfully", feedback });
   } catch (err) {
-    return console.log(err);
+    console.error("Error updating feedback:", err);
+    return res.status(500).json({ message: "Server error. Could not update feedback. Please try again later." });
   }
-  if (!feedback) {
-    return res.status(500).json({ message: "Unable To Update Feedback" + id });
-  }
-  return res.status(200).json({ feedback });
 });
 
-//Delete feedback
+// Delete feedback
 router.delete("/deleteFeedback/:id", async (req, res) => {
   const { id } = req.params;
-  let feedback;
+
   try {
-    feedback = await Feedback.findByIdAndRemove(id).populate("user");
+    const feedback = await Feedback.findByIdAndRemove(id).populate("user");
+    if (!feedback) {
+      return res.status(404).json({ message: "Feedback not found" });
+    }
+
     await feedback.user.feedbacks.pull(feedback);
     await feedback.user.save();
+    
+    return res.status(200).json({ message: "Feedback deleted successfully" });
   } catch (err) {
-    console.log(err);
+    console.error("Error deleting feedback:", err);
+    return res.status(500).json({ message: "Server error. Could not delete feedback. Please try again later." });
   }
-  if (!feedback) {
-    return res.status(500).json({ message: "Unable To Delete" });
-  }
-
-  return res.status(200).json({ message: "Successfull Delete" });
 });
 
-//Get a user feedback
+// Get feedbacks for a user
 router.get("/fuser/:id", async (req, res) => {
-  const userId = req.params.id;
-  let userFeedbacks;
+  const { id } = req.params;
+
   try {
-    userFeedbacks = await Feedback.find({ user: userId });
+    const userFeedbacks = await Feedback.find({ user: id });
+    if (!userFeedbacks || userFeedbacks.length === 0) {
+      return res.status(404).json({ message: "No feedbacks found for this user" });
+    }
+    return res.status(200).json({ feedbacks: userFeedbacks });
   } catch (err) {
-    return console.log(err);
+    console.error("Error fetching feedbacks for user:", err);
+    return res.status(500).json({ message: "Server error. Please try again later." });
   }
-  if (!userFeedbacks) {
-    return res.status(404).json({ message: "No Feedback Found" });
-  }
-  return res.status(200).json({ user: userFeedbacks });
 });
 
 module.exports = router;

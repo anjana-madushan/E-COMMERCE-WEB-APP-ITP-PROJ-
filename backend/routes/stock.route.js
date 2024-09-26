@@ -1,70 +1,75 @@
-let  express = require('express'),
+let express = require('express'),
   router = express.Router();
 
-// exam Model
+// stock Model
 let stockSchema = require('../models/Stock');
 
-// CREATE exam
-router.route('/create-stock').post((req, res, next) => {
- stockSchema.create(req.body, (error, data) => {
+// CREATE stock
+router.post('/create-stock', (req, res) => {
+  stockSchema.create(req.body, (error, data) => {
     if (error) {
-      return next(error)
+      console.error('Error creating stock:', error);
+      return res.status(500).json({ message: 'Failed to create stock. Please try again later.' });
     } else {
-      console.log(data)
-      res.json(data)
+      console.log('Stock created:', data);
+      res.status(201).json({ message: 'Stock created successfully', data });
     }
-  })
+  });
 });
 
-// READ grade
-router.route('/').get((req, res) => {
- stockSchema.find((error, data) => {
+// READ all stocks
+router.get('/', (req, res) => {
+  stockSchema.find((error, data) => {
     if (error) {
-      return next(error)
+      console.error('Error fetching stocks:', error);
+      return res.status(500).json({ message: 'Failed to fetch stocks. Please try again later.' });
     } else {
-      res.json(data)
+      res.status(200).json(data);
     }
-  })
-})
+  });
+});
 
-// Get Single grade
-router.route('/edit-stock/:id').get((req, res) => {
- stockSchema.findById(req.params.id, (error, data) => {
+// Get Single stock
+router.get('/edit-stock/:id', (req, res) => {
+  stockSchema.findById(req.params.id, (error, data) => {
     if (error) {
-      return next(error)
+      console.error('Error fetching stock:', error);
+      return res.status(500).json({ message: 'Failed to fetch stock. Please try again later.' });
+    } else if (!data) {
+      return res.status(404).json({ message: 'Stock not found' });
     } else {
-      res.json(data)
+      res.status(200).json(data);
     }
-  })
-})
+  });
+});
 
-
-// Update grade
-router.route('/update-stock/:id').put((req, res, next) => {
- stockSchema.findByIdAndUpdate(req.params.id, {
-    $set: req.body
-  }, (error, data) => {
+// UPDATE stock
+router.put('/update-stock/:id', (req, res) => {
+  stockSchema.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true }, (error, data) => {
     if (error) {
-      return next(error);
-      console.log(error)
+      console.error('Error updating stock:', error);
+      return res.status(500).json({ message: 'Failed to update stock. Please try again later.' });
+    } else if (!data) {
+      return res.status(404).json({ message: 'Stock not found' });
     } else {
-      res.json(data)
-      console.log('stock updated successfully !')
+      console.log('Stock updated:', data);
+      res.status(200).json({ message: 'Stock updated successfully', data });
     }
-  })
-})
+  });
+});
 
-// Delete grade
-router.route('/delete-stock/:id').delete((req, res, next) => {
- stockSchema.findByIdAndRemove(req.params.id, (error, data) => {
+// DELETE stock
+router.delete('/delete-stock/:id', (req, res) => {
+  stockSchema.findByIdAndRemove(req.params.id, (error, data) => {
     if (error) {
-      return next(error);
+      console.error('Error deleting stock:', error);
+      return res.status(500).json({ message: 'Failed to delete stock. Please try again later.' });
+    } else if (!data) {
+      return res.status(404).json({ message: 'Stock not found' });
     } else {
-      res.status(200).json({
-        msg: data
-      })
+      res.status(200).json({ message: 'Stock deleted successfully', data });
     }
-  })
-})
+  });
+});
 
 module.exports = router;

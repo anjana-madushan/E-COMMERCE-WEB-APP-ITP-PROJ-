@@ -17,20 +17,23 @@ const generateRefreshToken = (user) => {
   return jwt.sign({ id: user._id }, refreshTokenSecret, { expiresIn: refreshTokenLife });
 };
 
-//signup
+// Signup
 router.post('/signup', async (req, res) => {
   const { name, bdate, address, email, password } = req.body;
 
   try {
     const user = await User.create({ name, bdate, address, email, password });
-    res.json(user);
+    res.status(201).json({ message: 'User created successfully', user });
   } catch (e) {
-    if (e.code === 11000) return res.status(400).send('Email already exists');
-    res.status(400).send(e.message)
+    if (e.code === 11000) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+    console.error('Error creating user:', e);
+    res.status(500).json({ message: 'Failed to create user. Please try again later.' });
   }
-})
+});
 
-//login
+// Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -41,66 +44,80 @@ router.post('/login', async (req, res) => {
     user.tokens.push(refreshToken);
     await user.save();
 
-    res.json({ accessToken, refreshToken, user: user.toJSON() });
+    res.status(200).json({ accessToken, refreshToken, user: user.toJSON() });
   } catch (e) {
-    res.status(400).send(e.message)
+    console.error('Login error:', e);
+    res.status(400).json({ message: 'Invalid login credentials' });
   }
-})
+});
 
-//get user
+// Get all users (non-admin)
 router.get('/', async (req, res) => {
   try {
     const users = await User.find({ isAdmin: false }).populate('orders');
-    res.json(users);
+    res.status(200).json(users);
   } catch (e) {
-    res.status(400).send(e.message);
+    console.error('Error fetching users:', e);
+    res.status(500).json({ message: 'Failed to retrieve users. Please try again later.' });
   }
-})
-module.exports = router;
+});
 
-//get a user
+// Get a single user by ID
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const users = await User.findById(id);
-    res.json(users);
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
   } catch (e) {
-    res.status(400).send(e.message);
+    console.error('Error fetching user:', e);
+    res.status(500).json({ message: 'Failed to retrieve user. Please try again later.' });
   }
-})
-module.exports = router;
+});
 
-// get user orders
+// Get user orders by ID
 router.get('/:id/orders', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id).populate('orders');
-    res.json(user.orders);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user.orders);
   } catch (e) {
-    res.status(400).send(e.message);
+    console.error('Error fetching user orders:', e);
+    res.status(500).json({ message: 'Failed to retrieve user orders. Please try again later.' });
   }
-})
+});
 
-// update user notifcations
+// Update user notifications (mark as read)
 router.post('/:id/updateNotifications', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     user.notifications.forEach((notif) => {
-      notif.status = "read"
+      notif.status = "read";
     });
     user.markModified('notifications');
     await user.save();
-    res.status(200).send();
-  } catch (e) {
-    res.status(400).send(e.message)
-  }
-})
 
-// Refresh Token Route
+    res.status(200).json({ message: 'Notifications updated successfully' });
+  } catch (e) {
+    console.error('Error updating notifications:', e);
+    res.status(500).json({ message: 'Failed to update notifications. Please try again later.' });
+  }
+});
+
+// Refresh Token
 router.post('/refresh-token', async (req, res) => {
   const { refreshToken } = req.body;
-  if (!refreshToken) return res.status(401).send("Refresh Token Required");
+  if (!refreshToken) return res.status(401).json({ message: "Refresh Token Required" });
 
   try {
     // Verify the refresh token
@@ -108,13 +125,16 @@ router.post('/refresh-token', async (req, res) => {
     const user = await User.findById(decoded.id);
 
     if (!user || !user.tokens.includes(refreshToken)) {
-      return res.status(403).send("Invalid Refresh Token");
+      return res.status(403).json({ message: "Invalid Refresh Token" });
     }
 
     // Generate a new access token
     const accessToken = generateAccessToken(user);
-    res.json({ accessToken });
+    res.status(200).json({ accessToken });
   } catch (e) {
-    res.status(403).send("Invalid Token");
+    console.error('Error refreshing token:', e);
+    res.status(403).json({ message: "Invalid or expired Refresh Token" });
   }
 });
+
+module.exports = router;
