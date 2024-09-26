@@ -1,13 +1,17 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const http = require("http");
-require("dotenv").config();
-const Stripe = require("stripe");
-const passport = require("passport");
-const passportStrategy = require("./configs/passport");
+const http = require('http');
+const passportStrategy = require("./configs/passport
 const session = require("express-session");
 require("dotenv").config({ path: ".env.local" });
+const Stripe = require('stripe');
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+const passport = require('passport');
+require('./configs/passport');
+app.use(passport.initialize());
+
 
 /**TODO: @Anjana - Configure secure environment variables for Stripe**/
 const stripe = Stripe(
@@ -24,6 +28,36 @@ const io = new Server(server, {
 });
 
 // const User = require('./models/User');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
+const feedbackRoutes = require("./routes/feedbackRoutes");
+const imageRoutes = require('./routes/imageRoutes')
+const orderRoutes = require('./routes/orderRoutes');
+const stockRoute = require('./routes/stock.route')
+const gradeRoute = require('./routes/grade.route')
+
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log('Request received:', req.method, req.url);
+  next();
+});
+
+app.use('/auth', authRoutes);
+app.use('/users', passport.authenticate('jwt', { session: false }), userRoutes);
+app.use('/products', passport.authenticate('jwt', { session: false }), productRoutes);
+app.use('/images', passport.authenticate('jwt', { session: false }), imageRoutes);
+app.use("/feedbacks", passport.authenticate('jwt', { session: false }), feedbackRoutes);
+app.use('/orders', passport.authenticate('jwt', { session: false }), orderRoutes);
+app.use('/stocks', passport.authenticate('jwt', { session: false }), stockRoute)
+app.use('/grades', passport.authenticate('jwt', { session: false }), gradeRoute)
+
+//Stripe payments
+app.post('/create-payment', passport.authenticate('jwt', { session: false }), async (req, res) => {
+
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const feedbackRoutes = require("./routes/feedbackRoutes");

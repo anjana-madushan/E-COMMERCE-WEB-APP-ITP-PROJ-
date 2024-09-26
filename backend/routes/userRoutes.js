@@ -68,6 +68,9 @@ router.get("/google/callback", (req, res, next) => {
       return res.redirect("/oauth/failed");
     }
 
+
+//OAuth login 
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
     req.logIn(user, (err) => {
       if (err) {
         return next(err);
@@ -157,3 +160,7 @@ router.post("/refresh-token", async (req, res) => {
     res.status(403).send("Invalid Token");
   }
 });
+
+module.exports = router;
+
+
