@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 function Navigation() {
   const history = useNavigate();
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state?.user?.user);
   const bellRef = useRef(null)
   const notificationRef = useRef(null);
   const [bellPos, setBellPos] = useState({});
@@ -56,9 +56,9 @@ function handleToggleNotifications() {
      <LinkContainer to="/cart">
      <Nav.Link>
        <i className="fas fa-shopping-cart"></i>
-       {user?.cart.count > 0 && (
+       {user?.cart?.count > 0 && (
          <span className="badge badge-warning" id="cartcount">
-           {user.cart.count}
+           {user?.cart?.count}
          </span>
        )}
      </Nav.Link>
@@ -127,7 +127,7 @@ function handleToggleNotifications() {
       </Container>
       {/* Notification */}
       <div className="notifications-container" ref={notificationRef} style={{ position: "absolute", top: bellPos.top + 30, left: bellPos.left, display: "none" }}>
-                {user?.notifications.length > 0 ? (
+                {user?.notifications?.length > 0 ? (
                     user?.notifications.map((notification) => (
                         <p className={`notification-${notification.status}`}>
                             {notification.message}

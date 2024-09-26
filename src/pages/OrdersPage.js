@@ -7,7 +7,7 @@ import "../CSS/OrdersPage.css";
 import Pagination from "../components/Pagination";
 
 function OrdersPage() {
-    const user = useSelector((state) => state.user);
+    const user = useSelector((state) => state?.user?.user);
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
 
