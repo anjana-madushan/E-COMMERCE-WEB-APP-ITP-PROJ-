@@ -1,28 +1,57 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import "../CSS/Signup.css";
 import { useLoginMutation } from "../services/appApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
-import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
 import { setUser } from "../features/userSlice";
+import { jwtDecode } from "jwt-decode";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [oAuth, setOauth] = useState(false);
+  const [captchaValue, setCaptchaValue] = useState(null);
   const [login, { isError, isLoading, error }] = useLoginMutation();
   const query = new URLSearchParams(window.location.search);
   const token = query.get("token");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const recaptchaId = "recaptcha-container";
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://www.google.com/recaptcha/api.js";
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      if (window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+          if (!document.getElementById(recaptchaId).hasChildNodes()) {
+            window.grecaptcha.render(recaptchaId, {
+              sitekey: process.env.REACT_APP_CHALL_SITE_KEY,
+              callback: (response) => {
+                setCaptchaValue(response);
+              },
+            });
+          }
+        });
+      }
+    };
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [recaptchaId]);
 
   function handleLogin(e) {
     e.preventDefault();
-    if (!oAuth) {
+    if (!oAuth && captchaValue) {
       login({ email, password });
+    } else if (!oAuth) {
+      alert("Please complete the reCAPTCHA challenge.");
     } else {
       window.open(`${process.env.REACT_APP_API_URL}/users/google/`);
     }
@@ -31,11 +60,11 @@ function Login() {
   useEffect(() => {
     if (token) {
       const decodedUser = jwtDecode(token);
-      dispatch(setUser({ user: { email: decodedUser.email, _id: decodedUser._id } }));
+      dispatch(
+        setUser({ user: { email: decodedUser.email, _id: decodedUser._id } })
+      );
       query.delete("token");
       navigate(`?${query.toString()}`, { replace: true });
-
-      // Navigate to the home page
       navigate("/", { replace: true });
     }
   }, [token]);
@@ -45,7 +74,7 @@ function Login() {
       <Row>
         <Col md={6} className="login_from--container">
           <Form style={{ width: "100%" }} onSubmit={handleLogin}>
-            <h1>Loging to your accoutnt</h1>
+            <h1>Log in to your account</h1>
             {isError && <Alert variant="danger">{error.data}</Alert>}
 
             <Form.Group>
@@ -69,6 +98,17 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>
+
+            {/* This is where the reCAPTCHA widget will render */}
+            <div
+              id={recaptchaId}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                margin: "10px 0",
+              }}
+            />
+
             <div
               style={{
                 display: "flex",
@@ -99,8 +139,7 @@ function Login() {
             </div>
 
             <p>
-              {" "}
-              Dont have an account <Link to="/signup">Create account</Link>?
+              Don't have an account? <Link to="/signup">Create account</Link>
             </p>
           </Form>
         </Col>
