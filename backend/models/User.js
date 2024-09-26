@@ -1,80 +1,86 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
-const UserSchema = mongoose.Schema({
+const UserSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "is required"],
+    },
 
-  name: {
-    type: String,
-    required: [true, 'is required']
-  },
+    bdate: {
+      type: String,
+      required: [false, "is required"],
+    },
 
-  bdate: {
-    type: String,
-    required: [true, 'is required']
-  },
+    address: {
+      type: String,
+      required: [false, "is required"],
+    },
 
-  address: {
-    type: String,
-    required: [true, 'is required']
-  },
-
-  email: {
-    type: String,
-    required: [true, 'is required'],
-    unique: true,
-    index: true,
-    validate: {
-      validator: function (str) {
-        return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(str);
+    email: {
+      type: String,
+      required: [true, "is required"],
+      unique: true,
+      index: true,
+      validate: {
+        validator: function (str) {
+          return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(str);
+        },
+        message: (props) => `${props.value} is not a valid email`,
       },
-      message: props => `${props.value} is not a valid email`
-    }
+    },
+
+    password: {
+      type: String,
+      required: [false, "is required"],
+    },
+
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+
+    cart: {
+      type: Object,
+      default: {
+        total: 0,
+        count: 0,
+      },
+    },
+
+    feedbacks: {
+      type: Array,
+      default: [],
+    },
+
+    notifications: {
+      type: Array,
+      default: [],
+    },
+
+    tokens: {
+      type: Array,
+      default: [],
+    },
+
+    googleId: {
+      type: String,
+      required: [false, "is required"],
+    },
+
+    orders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }],
   },
-
-  password: {
-    type: String,
-    required: [true, 'is required']
-  },
-
-  isAdmin: {
-    type: Boolean,
-    default: false
-  },
-
-  cart: {
-    type: Object,
-    default: {
-      total: 0,
-      count: 0
-    }
-  },
-
-  feedbacks: {
-    type: Array,
-    default: []
-  },
-
-  notifications: {
-    type: Array,
-    default: []
-  },
-
-  tokens: {
-    type: Array,
-    default: []
-  },
-
-  orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }]
-
-}, { minimize: false });
+  { minimize: false }
+);
 
 UserSchema.statics.findByCredentials = async function (email, password) {
   const user = await User.findOne({ email });
-  if (!user) throw new Error('invalid credentials');
+  if (!user) throw new Error("invalid credentials");
   const isSamePassword = bcrypt.compareSync(password, user.password);
   if (isSamePassword) return user;
-  throw new Error('invalid credentials');
-}
+  throw new Error("invalid credentials");
+};
 
 UserSchema.methods.toJSON = function () {
   const user = this;
@@ -82,14 +88,13 @@ UserSchema.methods.toJSON = function () {
   delete userObject.password;
   delete userObject.tokens;
   return userObject;
-}
+};
 
 //before saving => hash the password
-UserSchema.pre('save', function (next) {
-
+UserSchema.pre("save", function (next) {
   const user = this;
 
-  if (!user.isModified('password')) return next();
+  if (!user.isModified("password")) return next();
 
   bcrypt.genSalt(10, function (err, salt) {
     if (err) return next(err);
@@ -99,18 +104,16 @@ UserSchema.pre('save', function (next) {
 
       user.password = hash;
       next();
-    })
-
-  })
-
-})
+    });
+  });
+});
 
 //Remove user check
 
-UserSchema.pre('remove', function (next) {
-  this.model('Order').remove({ owner: this._id }, next);
-})
+UserSchema.pre("remove", function (next) {
+  this.model("Order").remove({ owner: this._id }, next);
+});
 
-const User = mongoose.model('User', UserSchema);
+const User = mongoose.model("User", UserSchema);
 
 module.exports = User;

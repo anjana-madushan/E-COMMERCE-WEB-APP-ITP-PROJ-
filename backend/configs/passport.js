@@ -19,9 +19,30 @@ passport.use(
       callbackURL: "http://localhost:4000/users/google/callback",
       passReqToCallback: true,
     },
-    function (req, accessToken, refreshToken, profile, done) {
-      done(null, profile);
-      console.log("profile", profile);
+    async function (req, accessToken, refreshToken, profile, done) {
+      try {
+        // Check if user already exists
+        let user = await User.findOne({ email: profile.emails[0].value });
+
+        if (!user) {
+          // Create a new user if not found
+          user = new User({
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            googleId: profile.id,
+          });
+          await user.save();
+        } else {
+          //Verify user
+          user = await User.findOne({ email: profile.emails[0].value });
+          user.googleId = profile.id;
+        }
+
+        done(null, user);
+      } catch (error) {
+        console.log(error);
+        done(error, false);
+      }
     }
   )
 );
