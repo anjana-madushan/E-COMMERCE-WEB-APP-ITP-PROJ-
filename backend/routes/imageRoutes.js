@@ -2,20 +2,19 @@ const cloudinary = require('cloudinary');
 const router = require('express').Router();
 require('dotenv').config();
 
-// TODO: @Anjana - Configure secure environment variables for Cloudinary
 cloudinary.config({
-  cloud_name:  "dvcfip5fe",
-  api_key:  "533411778726318",
-  api_secret:"T8fEINJkTuTgW8YGj4o8Hh8ziyQ"  
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 })
 
-router.delete('/:public_id', async(req, res)=> {
-  const {public_id} = req.params;
+router.delete('/:public_id', async (req, res) => {
+  const { public_id } = req.params;
   try {
-      await cloudinary.uploader.destroy(public_id);
-      res.status(200).send();
+    await cloudinary.uploader.destroy(public_id);
+    res.status(200).send();
   } catch (e) {
-      res.status(400).send(e.message)
+    res.status(400).send(e.message)
   }
 })
 

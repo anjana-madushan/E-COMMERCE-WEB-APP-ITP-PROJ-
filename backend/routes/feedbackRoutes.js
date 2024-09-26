@@ -2,6 +2,8 @@ const router = require("express").Router();
 const mongoose = require("mongoose");
 const Feedback = require("../models/Feedback");
 const User = require("../models/User");
+var axios = require("axios");
+const { ScanUrl } = require("../configs/virusTotal")
 
 //get all feedbacks
 router.get("/getallfeedbacks", async (req, res) => {
@@ -36,33 +38,54 @@ router.get("/report/:date", async (req, res) => {
 router.post("/addFeedback", async (req, res) => {
   const { title, description, image, user } = req.body;
 
+  const imageUrl = image;
+  console.log(imageUrl);
+
+  // Await the ScanUrl function to check the image URL
+  let isSafe;
+  try {
+    isSafe = await ScanUrl(imageUrl); // Use await to handle the promise
+  } catch (error) {
+    console.error('Error during URL scanning:', error);
+    return res.status(500).json({ message: 'Error scanning the image URL' });
+  }
+  if (!isSafe) {
+    console.log('Unsafe image detected');
+    return res.status(400).json({ message: `Image ${imageUrl} is unsafe.` });
+  }
+
   let existingUser;
   try {
     existingUser = await User.findById(user);
+    if (!existingUser) {
+      return res.status(400).json({ message: "Unable to find user by this ID" });
+    }
   } catch (err) {
-    return console.log(err);
+    console.error('Error finding user:', err);
+    return res.status(500).json({ message: 'Error retrieving user' });
   }
-  if (!existingUser) {
-    return res.status(400).json({ message: "Unable To Find User By this ID" });
-  }
+
   const feedback = new Feedback({
     title,
     description,
     image,
     user,
   });
+
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
+
     await feedback.save({ session });
     existingUser.feedbacks.push(feedback);
     await existingUser.save({ session });
+
     await session.commitTransaction();
+    return res.status(200).json({ feedback });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: err });
+    console.error('Error saving feedback:', err);
+    return res.status(500).json({ message: err.message });
   }
-  return res.status(200).json({ feedback });
 });
 
 //Update feedback

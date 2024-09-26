@@ -1,12 +1,14 @@
-require('dotenv').config({ path: '.env.local' });
+require('dotenv').config();
 
 const mongoose = require('mongoose');
 
-const connectionStr = process.env.MONGO_URI;
-mongoose.connect(connectionStr, {useNewUrlparser: true})
-.then(() => console.log('connected to mongodb'))
-.catch(err => console.log(err))
+// Use the environment variable if it exists, otherwise use the hardcoded URI
+const connectionStr = process.env.MONGODB_CONNECTION_STR;
+
+mongoose.connect(connectionStr, { useNewUrlParser: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.log(err));
 
 mongoose.connection.on('error', err => {
-  console.log(err)
-})
+  console.log(err);
+});

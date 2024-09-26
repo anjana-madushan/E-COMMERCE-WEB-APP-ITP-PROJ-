@@ -4,8 +4,7 @@ const app = express();
 const http = require('http');
 require('dotenv').config();
 const Stripe = require('stripe');
-//TODO: @Anjana - Configure secure environment variables for Stripe
-const stripe = Stripe('sk_test_51LhBwPD1ftP7zi2EFzCqknBRwERKsNxtKCEJGL7I6ng3mSy6nOAW8kSIz8ivpxVXBpGfcObm7cRCFzqh1rIHcDYR00VAPeCQ9k');
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 require('./connection');
 const server = http.createServer(app);
@@ -15,7 +14,6 @@ const io = new Server(server, {
   cors: '*',
   methods: '*'
 })
-
 
 // const User = require('./models/User');
 const userRoutes = require('./routes/userRoutes');

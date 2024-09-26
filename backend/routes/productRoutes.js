@@ -1,55 +1,66 @@
 const router = require('express').Router();
+const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const User = require('../models/User');
+// const { scanImageWithVirusTotal } = require('../configs/virusTotal');
+const { validateProductInput } = require('../validations/validations')
+const { sanitizeProductInput } = require('../validations/sanitization')
 
+require('dotenv').config();
 //get products;
-router.get('/', async(req, res)=> {
+router.get('/', async (req, res) => {
   try {
-    //const sort = {'_id': -1}.sort(sort); short eka yata ekata
     const products = await Product.find();
     res.status(200).json(products);
   } catch (e) {
-    res.status(400).send(e.message);
+    console.error(e)
+    return res.status(400).send(e.message);
   }
 })
 
-
 //create product
-router.post('/', async(req, res)=> {
+router.post('/', async (req, res) => {
   try {
-    const {name, description, price, category, images: pictures} = req.body;
-    const product = await Product.create({name, description, price, category, pictures});
+    console.log(req.body)
+    validateProductInput(req.body);
+    const sanitizedInput = sanitizeProductInput(req.body);
+
+    const { name, description, price, category, images: pictures } = sanitizedInput
+    const product = await Product.create({ name, description, price, category, pictures });
+
     const products = await Product.find();
     res.status(201).json(products);
   } catch (e) {
+    console.log(e);
     res.status(400).send(e.message);
   }
-})
-
+});
 
 // update product
-
-router.patch('/:id', async(req, res)=> {
-  const {id} = req.params;
+router.patch('/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const {name, description, price, category, images: pictures} = req.body;
-    const product = await Product.findByIdAndUpdate(id, {name, description, price, category, pictures});
-    const products = await Product.find();
-    res.status(200).json(products);
+    validateProductInput(req.body);
+    const sanitizedInput = sanitizeProductInput(req.body);
+    const { name, description, price, category, pictures } = sanitizedInput
+    const product = await Product.findByIdAndUpdate(id, { name, description, price, category, pictures }, { new: true });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.status(200).json(product);
   } catch (e) {
-    res.status(400).send(e.message);
+    res.status(400).json({ message: 'An error occurred while updating the product' });
   }
 })
 
 
 // delete product
-
-router.delete('/:id', async(req, res)=> {
-  const {id} = req.params;
-  const {user_id} = req.body;
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { user_id } = req.body;
   try {
     const user = await User.findById(user_id);
-    if(!user.isAdmin) return res.status(401).json("You don't have permission");
+    if (!user.isAdmin) return res.status(401).json("You don't have permission");
     await Product.findByIdAndDelete(id);
     const products = await Product.find();
     res.status(200).json(products);
@@ -59,36 +70,42 @@ router.delete('/:id', async(req, res)=> {
 })
 
 //get specific product
-router.get('/:id', async(req, res)=> {
-  const {id} = req.params;
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid product ID' });
+  }
   try {
     const product = await Product.findById(id);
-    const similar = await Product.find({category: product.category}).limit(5);
-    res.status(200).json({product, similar})
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    const similar = await Product.find({ category: product.category }).limit(5);
+    res.status(200).json({ product, similar })
   } catch (e) {
     res.status(400).send(e.message);
   }
 });
 
-router.get('/category/:category', async(req,res)=> {
-  const {category} = req.params;
+router.get('/category/:category', async (req, res) => {
+  const { category } = req.params;
   try {
     let products;
-  
-    if(category == "all"){
-      products = await Product.find().sort([['date',-1]]);
+
+    if (category === "all") {
+      products = await Product.find().sort([['date', -1]]);
     } else {
-      products = await Product.find({category})
+      products = await Product.find({ category })
     }
     res.status(200).json(products)
   } catch (e) {
-    res.status(400).send(e.message);
+    console.error(e);
+    return res.status(400).send({ message: 'Internal server error' });
   }
 })
 
 
 // cart routes
-
 router.post('/add-to-cart', async (req, res) => {
   const { userId, productId, price } = req.body;
 
