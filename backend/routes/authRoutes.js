@@ -162,7 +162,7 @@ router.get("/google/callback", (req, res, next) => {
          httpOnly: true, // Prevent access from JavaScript
          secure: process.env.NODE_ENV === 'production', // Send only over HTTPS in production
          sameSite: 'strict',
-         maxAge: ms(refreshTokenLife) // Refresh token expiration (e.g., 7 days)
+         maxAge: ms(refreshTokenLife) // Refresh token expiration 
        });
 
       //Redirect with JWT in query string (token only)
