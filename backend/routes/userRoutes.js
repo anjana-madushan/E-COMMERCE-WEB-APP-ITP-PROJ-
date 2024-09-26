@@ -48,6 +48,7 @@ router.post('/login', async (req, res) => {
   }
 })
 
+
 //OAuth login 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
@@ -111,24 +112,4 @@ router.post('/:id/updateNotifications', async (req, res) => {
   }
 })
 
-// Refresh Token Route
-router.post('/refresh-token', async (req, res) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken) return res.status(401).send("Refresh Token Required");
-
-  try {
-    // Verify the refresh token
-    const decoded = jwt.verify(refreshToken, refreshTokenSecret);
-    const user = await User.findById(decoded.id);
-
-    if (!user || !user.tokens.includes(refreshToken)) {
-      return res.status(403).send("Invalid Refresh Token");
-    }
-
-    // Generate a new access token
-    const accessToken = generateAccessToken(user);
-    res.json({ accessToken });
-  } catch (e) {
-    res.status(403).send("Invalid Token");
-  }
-});
+module.exports = router;
