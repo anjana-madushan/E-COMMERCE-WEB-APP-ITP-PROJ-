@@ -25,7 +25,7 @@
     "passport-jwt": "^4.0.1",
     "socket.io": "^4.5.1",
     "socket.io-client": "^4.5.3",
-    "stripe": "^10.7.0",
+    "stripe": "^10.17.0",
     "validator": "^13.7.0"
   }
 }
